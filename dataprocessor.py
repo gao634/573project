@@ -34,4 +34,10 @@ def main():
     # doesnt change binary variables, but one-hotting with no drop will double the distance
     df = pd.get_dummies(df, columns=['Transportation', 'Sex', 'Family', 'Junk', 'Smoking', 'Calories'])
     df.to_csv('obesity_encoded.csv', index=False)
-#main()
+    df = pd.get_dummies(df, columns=['Vegetables', 'Meals', 'Between', 'Liquids', 'Exercise', 'Technology'])
+    df.to_csv('obesity_neural.csv', index=False)
+    df['Class'] -= 1
+    print('complete')
+
+if __name__ == '__main__':
+    main()

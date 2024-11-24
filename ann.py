@@ -26,15 +26,16 @@ class NeuralNetwork(nn.Module):
         x = self.relu(self.fc2(x))
         x = self.relu(self.fc3(x))
         x = self.relu(self.fc4(x))
-        x = self.softmax(self.fc5(x))
+        #x = self.softmax(self.fc5(x))
         return x
     
-def trainer(params, X_train, y_train):
-    if params is None:
-        lr= 0.001
-        batch = 200
+def trainer(par, X_train, y_train):
+    if par is None:
+        epochs = 200
+        lr = 0.001
+        batch = 50
         ver = 1
-    else: lr, batch, ver = params
+    else: epochs, lr, batch, ver = par
     
     X_tensor = torch.tensor(X_train, dtype=torch.float32)
     y_tensor = torch.tensor(y_train, dtype=torch.long)
@@ -42,14 +43,14 @@ def trainer(params, X_train, y_train):
     dataset = TensorDataset(X_tensor, y_tensor)
     dataloader = DataLoader(dataset, batch_size=batch, shuffle=True)
 
-    model = NeuralNetwork()
+    model = NeuralNetwork(X_train.shape[1])
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
-    num_epochs = 200
+    num_epochs = epochs
     losses = []
     for epoch in range(num_epochs):
         for inputs, labels in dataloader:
@@ -74,10 +75,13 @@ def trainer(params, X_train, y_train):
             plt.title('Training Loss')
             plt.legend()
             plt.savefig(f'losses/ann/loss{ver}.png')
+    torch.save(model, f'losses/models/ann{ver}.pth')
     return model
 
 def tester(model, X_test, y_test):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.eval()
+    model.to(device)
     correct = 0
     total = 0
 
@@ -88,6 +92,8 @@ def tester(model, X_test, y_test):
     dataloader = DataLoader(dataset, batch_size=200, shuffle=True)
     with torch.no_grad():
         for data, labels in dataloader:
+            data = data.to(device)
+            labels = labels.to(device)
             outputs = model(data)
 
             _, predicted = torch.max(outputs.data, 1)
@@ -99,8 +105,14 @@ def tester(model, X_test, y_test):
     #print(f'NN acc: {accuracy:.2f}%')
     return accuracy
 
-def ANN(params, X_train, X_test, y_train, y_test):
-    model = trainer(params, X_train, y_train)
-    accuracy_train = trainer(model, X_train, y_train)
-    accuracy_test = trainer(model, X_test, y_test)
+def ANN(par, X_train, X_test, y_train, y_test):
+    X_train = X_train.values.astype(int)
+    X_test = X_test.values.astype(int)
+    y_train = y_train.values.astype(int)
+    y_test = y_test.values.astype(int)
+    #print(X_train.dtype)
+
+    model = trainer(par, X_train, y_train)
+    accuracy_train = tester(model, X_train, y_train)
+    accuracy_test = tester(model, X_test, y_test)
     return accuracy_train, accuracy_test
