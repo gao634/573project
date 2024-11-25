@@ -23,10 +23,11 @@ def main():
     best_ver = np.argmax(np.asarray(test_accs))
     lr_ind = int(best_ver / 3)
     batch_ind = int(best_ver % 3)
-    params = [2000, lrs[lr_ind], batches[batch_ind], ver]
-    train_acc, test_acc = ann.ANN(params, X_train, X_test, y_train, y_test)
-    print(f"Average Training Accuracy: {train_acc:.2f}")
-    print(f"Average Testing Accuracy: {test_acc:.2f}")
+    print(lrs[lr_ind], batches[batch_ind])
+    #params = [2000, lrs[lr_ind], batches[batch_ind], ver]
+    #train_acc, test_acc = ann.ANN(params, X_train, X_test, y_train, y_test)
+    #print(f"Average Training Accuracy: {train_acc:.2f}")
+    #print(f"Average Testing Accuracy: {test_acc:.2f}")
 
 if __name__ == '__main__':
     main()

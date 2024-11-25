@@ -74,8 +74,8 @@ def trainer(par, X_train, y_train):
             plt.ylabel('Loss')
             plt.title('Training Loss')
             plt.legend()
-            plt.savefig(f'losses/ann/loss{ver}.png')
-    torch.save(model, f'losses/models/ann{ver}.pth')
+            plt.savefig(f'training/ann/losses/loss{ver}.png')
+    torch.save(model, f'training/ann/models/ann{ver}.pth')
     return model
 
 def tester(model, X_test, y_test):
