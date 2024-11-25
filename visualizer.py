@@ -2,15 +2,27 @@ import tester
 import knn
 import matplotlib.pyplot as plt
 import dataprocessor as dp
+from sklearn.model_selection import train_test_split
 import rf
 import numpy as np
+import nca
+import warnings
+from metric_learn import NCA as NCA_learn
+
+
+warnings.filterwarnings('ignore')
 def plot(func, X, y, path):
     k_values = range(1, 21)
     training_accuracies = []
     testing_accuracies = []
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    ncaa = NCA_learn(max_iter=100, random_state=42)
+    ncaa.fit(X_train, y_train)
 
     for k in k_values:
-        train_acc, test_acc = tester.kfold(10, func, k, X, y)
+        print(k)
+        #train_acc, test_acc = tester.kfold(10, func, k, X, y)
+        train_acc, test_acc = func(k, ncaa, X_train, X_test, y_train, y_test)
         training_accuracies.append(train_acc)
         testing_accuracies.append(test_acc)
 
@@ -31,7 +43,7 @@ def plot(func, X, y, path):
                  xytext=(0,10),  # distance from text to points (x,y)
                  ha='center')  # horizontal alignment can be left, right or center
 
-    plt.title('K Nearest Neighbors Training and Testing Accuracies')
+    plt.title('K Nearest Neighbors with NCA')
     plt.xlabel('Number of Neighbors')
     #plt.title('Random Forest Training and Testing Accuracies')
     #plt.xlabel('Number of Decison Trees')
@@ -45,5 +57,5 @@ def plot(func, X, y, path):
 X, y = dp.label('obesity_encoded.csv')
 #X, y = dp.label('obesity_min_max_scaled.csv')
 #X, y = dp.label('obesity.csv')
-path = 'figures/knn3.png'
-plot(knn.KNN, X, y, path)
+path = 'figures/nca.png'
+plot(nca.NCA, X, y, path)
